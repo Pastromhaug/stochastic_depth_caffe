@@ -5,9 +5,9 @@
 #include <iostream>
 #include <stdio.h>
 #include <assert.h>
-#include "/home/zl499/caffe/include/caffe.hpp"
+#include "/home/zl499/caffe/include/caffe/caffe.hpp"
 #include "/home/zl499/caffe/include/caffe/util/io.hpp"
-#include "/home/zl499/caffe/include/caffe/blob.hpp"
+#include "/home/zl499/caffe/include/caffe/blobs.hpp"
 
 using namespace caffe;
 using namespace std;
