@@ -17,7 +17,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
 	std::cout << "it's working\n";
-	Caffe::set_mode(Caffe::GPU);
+	Caffe::set_mode(Caffe::CPU);
 	
 	string param_file = "examples/stochastic_depth_caffe/solver.prototxt";
 	

@@ -1,0 +1,250 @@
+layer {
+  name: "Data1"
+  type: "Data"
+  top: "Data1"
+  top: "Data2"
+  transform_param {
+    mirror: true
+    crop_size: 32
+  }
+  data_param {
+    source: "examples/cifar10/cifar10_train_leveldb_padding0"
+    batch_size: 128
+    backend: LEVELDB
+  }
+}
+layer {
+  name: "Convolution1"
+  type: "Convolution"
+  bottom: "Data1"
+  top: "Convolution1"
+  convolution_param {
+    num_output: 16
+    bias_term: true
+    pad: 1
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "BatchNorm1"
+  type: "BatchNorm"
+  bottom: "Convolution1"
+  top: "Convolution1"
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+}
+layer {
+  name: "Scale1"
+  type: "Scale"
+  bottom: "Convolution1"
+  top: "Convolution1"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "ReLU1"
+  type: "ReLU"
+  bottom: "Convolution1"
+  top: "Convolution1"
+}
+layer {
+  name: "ReLU2"
+  type: "ReLU"
+  bottom: "Convolution1"
+  top: "Convolution1"
+}
+layer {
+  name: "ReLU3"
+  type: "ReLU"
+  bottom: "Convolution1"
+  top: "Convolution1"
+}
+layer {
+  name: "ReLU4"
+  type: "ReLU"
+  bottom: "Convolution1"
+  top: "Convolution1"
+}
+layer {
+  name: "ReLU5"
+  type: "ReLU"
+  bottom: "Convolution1"
+  top: "Convolution1"
+}
+layer {
+  name: "Pooling1"
+  type: "Pooling"
+  bottom: "Convolution1"
+  top: "Pooling1"
+  pooling_param {
+    pool: AVE
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "Input1"
+  type: "Input"
+  top: "Input1"
+  input_param {
+    shape {
+      dim: 128
+      dim: 16
+      dim: 16
+      dim: 16
+    }
+  }
+}
+layer {
+  name: "Concat1"
+  type: "Concat"
+  bottom: "Pooling1"
+  bottom: "Input1"
+  top: "Concat1"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
+  name: "ReLU6"
+  type: "ReLU"
+  bottom: "Concat1"
+  top: "Concat1"
+}
+layer {
+  name: "ReLU7"
+  type: "ReLU"
+  bottom: "Concat1"
+  top: "Concat1"
+}
+layer {
+  name: "ReLU8"
+  type: "ReLU"
+  bottom: "Concat1"
+  top: "Concat1"
+}
+layer {
+  name: "ReLU9"
+  type: "ReLU"
+  bottom: "Concat1"
+  top: "Concat1"
+}
+layer {
+  name: "ReLU10"
+  type: "ReLU"
+  bottom: "Concat1"
+  top: "Concat1"
+}
+layer {
+  name: "Pooling2"
+  type: "Pooling"
+  bottom: "Concat1"
+  top: "Pooling2"
+  pooling_param {
+    pool: AVE
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "Input2"
+  type: "Input"
+  top: "Input2"
+  input_param {
+    shape {
+      dim: 128
+      dim: 32
+      dim: 8
+      dim: 8
+    }
+  }
+}
+layer {
+  name: "Concat2"
+  type: "Concat"
+  bottom: "Pooling2"
+  bottom: "Input2"
+  top: "Concat2"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
+  name: "ReLU11"
+  type: "ReLU"
+  bottom: "Concat2"
+  top: "Concat2"
+}
+layer {
+  name: "ReLU12"
+  type: "ReLU"
+  bottom: "Concat2"
+  top: "Concat2"
+}
+layer {
+  name: "ReLU13"
+  type: "ReLU"
+  bottom: "Concat2"
+  top: "Concat2"
+}
+layer {
+  name: "ReLU14"
+  type: "ReLU"
+  bottom: "Concat2"
+  top: "Concat2"
+}
+layer {
+  name: "ReLU15"
+  type: "ReLU"
+  bottom: "Concat2"
+  top: "Concat2"
+}
+layer {
+  name: "Pooling3"
+  type: "Pooling"
+  bottom: "Concat2"
+  top: "Pooling3"
+  pooling_param {
+    pool: AVE
+    global_pooling: true
+  }
+}
+layer {
+  name: "InnerProduct1"
+  type: "InnerProduct"
+  bottom: "Pooling3"
+  top: "InnerProduct1"
+  inner_product_param {
+    num_output: 10
+    bias_term: true
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "SoftmaxWithLoss1"
+  type: "SoftmaxWithLoss"
+  bottom: "InnerProduct1"
+  bottom: "Data2"
+  top: "SoftmaxWithLoss1"
+}
+
