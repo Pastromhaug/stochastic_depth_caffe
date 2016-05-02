@@ -27,8 +27,23 @@ int main(int argc, char** argv)
 	shared_ptr<Net<float> > net = solver->net();
 	vector<shared_ptr<Layer<float> > > layers = net->layers();
 	
+	//cout << layers.size() << endl;
 	for (int i = 0; i < layers.size(); i++) {
-		cout << layers[i]  << endl;
+		//cout << layers[i]  << endl; 
+		//net->ForwardFromTo(i, i+1)	
+	}
+	
+	vector<shared_ptr<Blob<float> > > blobs = net->blobs();
+	
+	//cout << blobs.size() << endl;	
+	for (int i = 0; i < blobs.size(); i++) {
+		//cout << blobs[i] << endl;
+	}
+
+	vector<vector<Blob<float>* > > bottom_vecs = net->bottom_vecs();
+	//cout << bottom_vecs.size() << endl;
+	for (int i = 0; i < bottom_vecs.size(); i++) {
+		//cout << bottom_vecs[i].size() << endl;	
 	}
 	
 	cout << "yeee\n";	
