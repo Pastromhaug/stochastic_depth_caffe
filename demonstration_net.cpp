@@ -25,7 +25,12 @@ int main(int argc, char** argv)
   	ReadSolverParamsFromTextFileOrDie(param_file, &param);
   	Solver<float>* solver = SolverRegistry<float>::CreateSolver(param);	
 	shared_ptr<Net<float> > net = solver->net();
-
+	vector<shared_ptr<Layer<float> > > layers = net->layers();
+	
+	for (int i = 0; i < layers.size(); i++) {
+		cout << layers[i]  << endl;
+	}
+	
 	cout << "yeee\n";	
 
 }

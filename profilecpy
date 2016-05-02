@@ -1,0 +1,9 @@
+export PYTHONPATH="/usr/local/caffe/python"
+export LD_PRELOAD="/usr/local/anaconda2/lib/libmkl_core.so:/usr/local/anaconda2/lib/libmkl_sequential.so"
+export LD_LIBRARY_PATH="/usr/lib/caffe:/usr/openwin/lib:/usr/dt/lib:/X11.6/lib:/X11.5/lib:/uva/lib:/gnu/lib:/usr/local/cuda/lib64"
+export PATH="/usr/local/anaconda2/bin/:$PATH"
+export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu/:/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+export C_INCLUDE_PATH="/usr/local/anaconda2/include/:$C_INCLUDE_PATH"
+export CPLUS_INCLUDE_PATH="/usr/local/anaconda2/include/:$CPLUS_INCLUDE_PATH"
+export CPLUS_INCLUDE_PATH="/usr/local/anaconda2/include/python2.7/:$CPLUS_INCLUDE_PATH"
