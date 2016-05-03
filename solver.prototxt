@@ -13,3 +13,4 @@ random_seed: 831486
 stepvalue: 32000
 stepvalue: 48000
 type: "Nesterov"
+display: 100

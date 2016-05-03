@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 	std::cout << "it's working\n";
 	Caffe::set_mode(Caffe::GPU);
 	
-	string param_file = "examples/stochastic_depth_caffe/solver.prototxt";
+	string param_file = "examples/mnist/lenet_solver.prototxt";
 	
   	SolverParameter param;
   	ReadSolverParamsFromTextFileOrDie(param_file, &param);
