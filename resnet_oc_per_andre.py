@@ -181,7 +181,7 @@ def make_solver(niter=50000, lr = 0.1):
     s.stepvalue.append(int(0.75 * s.max_iter))
     s.solver_mode = caffe_pb2.SolverParameter.GPU
 
-    solver_path = 'examples/resnet_cifar/solver.prototxt'
+    solver_path = 'examples/stochastic_depth_caffe/solver.prototxt'
     with open(solver_path, 'w') as f:
         f.write(str(s))
 
@@ -210,3 +210,4 @@ if __name__ == '__main__':
 
 
     make_net(stages, device)
+	make_solver(niter=5000, lr=0.1)

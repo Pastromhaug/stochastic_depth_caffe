@@ -8,7 +8,7 @@ layer {
     crop_size: 32
   }
   data_param {
-    source: "examples/cifar10/cifar10_train_leveldb_padding0"
+    source: "examples/cifar10/cifar10_test_leveldb_padding0"
     batch_size: 100
     backend: LEVELDB
   }
@@ -164,26 +164,25 @@ layer {
   }
 }
 layer {
-  name: "Python1"
-  type: "Python"
+  name: "Eltwise1"
+  type: "Eltwise"
   bottom: "Convolution1"
   bottom: "Convolution3"
-  top: "Python1"
-  python_param {
-    module: "resnet_oc"
-    layer: "Add"
+  top: "Eltwise1"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "ReLU3"
   type: "ReLU"
-  bottom: "Python1"
-  top: "Python1"
+  bottom: "Eltwise1"
+  top: "Eltwise1"
 }
 layer {
   name: "Convolution4"
   type: "Convolution"
-  bottom: "Python1"
+  bottom: "Eltwise1"
   top: "Convolution4"
   convolution_param {
     num_output: 16
@@ -279,26 +278,25 @@ layer {
   }
 }
 layer {
-  name: "Python2"
-  type: "Python"
-  bottom: "Python1"
+  name: "Eltwise2"
+  type: "Eltwise"
+  bottom: "Eltwise1"
   bottom: "Convolution5"
-  top: "Python2"
-  python_param {
-    module: "resnet_oc"
-    layer: "Add"
+  top: "Eltwise2"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "ReLU5"
   type: "ReLU"
-  bottom: "Python2"
-  top: "Python2"
+  bottom: "Eltwise2"
+  top: "Eltwise2"
 }
 layer {
   name: "Convolution6"
   type: "Convolution"
-  bottom: "Python2"
+  bottom: "Eltwise2"
   top: "Convolution6"
   convolution_param {
     num_output: 16
@@ -394,26 +392,25 @@ layer {
   }
 }
 layer {
-  name: "Python3"
-  type: "Python"
-  bottom: "Python2"
+  name: "Eltwise3"
+  type: "Eltwise"
+  bottom: "Eltwise2"
   bottom: "Convolution7"
-  top: "Python3"
-  python_param {
-    module: "resnet_oc"
-    layer: "Add"
+  top: "Eltwise3"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "ReLU7"
   type: "ReLU"
-  bottom: "Python3"
-  top: "Python3"
+  bottom: "Eltwise3"
+  top: "Eltwise3"
 }
 layer {
   name: "Convolution8"
   type: "Convolution"
-  bottom: "Python3"
+  bottom: "Eltwise3"
   top: "Convolution8"
   convolution_param {
     num_output: 16
@@ -509,26 +506,25 @@ layer {
   }
 }
 layer {
-  name: "Python4"
-  type: "Python"
-  bottom: "Python3"
+  name: "Eltwise4"
+  type: "Eltwise"
+  bottom: "Eltwise3"
   bottom: "Convolution9"
-  top: "Python4"
-  python_param {
-    module: "resnet_oc"
-    layer: "Add"
+  top: "Eltwise4"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "ReLU9"
   type: "ReLU"
-  bottom: "Python4"
-  top: "Python4"
+  bottom: "Eltwise4"
+  top: "Eltwise4"
 }
 layer {
   name: "Pooling1"
   type: "Pooling"
-  bottom: "Python4"
+  bottom: "Eltwise4"
   top: "Pooling1"
   pooling_param {
     pool: AVE
@@ -562,7 +558,7 @@ layer {
 layer {
   name: "Convolution10"
   type: "Convolution"
-  bottom: "Python4"
+  bottom: "Eltwise4"
   top: "Convolution10"
   convolution_param {
     num_output: 32
@@ -658,26 +654,25 @@ layer {
   }
 }
 layer {
-  name: "Python5"
-  type: "Python"
+  name: "Eltwise5"
+  type: "Eltwise"
   bottom: "Concat1"
   bottom: "Convolution11"
-  top: "Python5"
-  python_param {
-    module: "resnet_oc"
-    layer: "Add"
+  top: "Eltwise5"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "ReLU11"
   type: "ReLU"
-  bottom: "Python5"
-  top: "Python5"
+  bottom: "Eltwise5"
+  top: "Eltwise5"
 }
 layer {
   name: "Convolution12"
   type: "Convolution"
-  bottom: "Python5"
+  bottom: "Eltwise5"
   top: "Convolution12"
   convolution_param {
     num_output: 32
@@ -773,26 +768,25 @@ layer {
   }
 }
 layer {
-  name: "Python6"
-  type: "Python"
-  bottom: "Python5"
+  name: "Eltwise6"
+  type: "Eltwise"
+  bottom: "Eltwise5"
   bottom: "Convolution13"
-  top: "Python6"
-  python_param {
-    module: "resnet_oc"
-    layer: "Add"
+  top: "Eltwise6"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "ReLU13"
   type: "ReLU"
-  bottom: "Python6"
-  top: "Python6"
+  bottom: "Eltwise6"
+  top: "Eltwise6"
 }
 layer {
   name: "Convolution14"
   type: "Convolution"
-  bottom: "Python6"
+  bottom: "Eltwise6"
   top: "Convolution14"
   convolution_param {
     num_output: 32
@@ -888,26 +882,25 @@ layer {
   }
 }
 layer {
-  name: "Python7"
-  type: "Python"
-  bottom: "Python6"
+  name: "Eltwise7"
+  type: "Eltwise"
+  bottom: "Eltwise6"
   bottom: "Convolution15"
-  top: "Python7"
-  python_param {
-    module: "resnet_oc"
-    layer: "Add"
+  top: "Eltwise7"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "ReLU15"
   type: "ReLU"
-  bottom: "Python7"
-  top: "Python7"
+  bottom: "Eltwise7"
+  top: "Eltwise7"
 }
 layer {
   name: "Convolution16"
   type: "Convolution"
-  bottom: "Python7"
+  bottom: "Eltwise7"
   top: "Convolution16"
   convolution_param {
     num_output: 32
@@ -1003,26 +996,25 @@ layer {
   }
 }
 layer {
-  name: "Python8"
-  type: "Python"
-  bottom: "Python7"
+  name: "Eltwise8"
+  type: "Eltwise"
+  bottom: "Eltwise7"
   bottom: "Convolution17"
-  top: "Python8"
-  python_param {
-    module: "resnet_oc"
-    layer: "Add"
+  top: "Eltwise8"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "ReLU17"
   type: "ReLU"
-  bottom: "Python8"
-  top: "Python8"
+  bottom: "Eltwise8"
+  top: "Eltwise8"
 }
 layer {
   name: "Convolution18"
   type: "Convolution"
-  bottom: "Python8"
+  bottom: "Eltwise8"
   top: "Convolution18"
   convolution_param {
     num_output: 32
@@ -1118,26 +1110,25 @@ layer {
   }
 }
 layer {
-  name: "Python9"
-  type: "Python"
-  bottom: "Python8"
+  name: "Eltwise9"
+  type: "Eltwise"
+  bottom: "Eltwise8"
   bottom: "Convolution19"
-  top: "Python9"
-  python_param {
-    module: "resnet_oc"
-    layer: "Add"
+  top: "Eltwise9"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "ReLU19"
   type: "ReLU"
-  bottom: "Python9"
-  top: "Python9"
+  bottom: "Eltwise9"
+  top: "Eltwise9"
 }
 layer {
   name: "Pooling2"
   type: "Pooling"
-  bottom: "Python9"
+  bottom: "Eltwise9"
   top: "Pooling2"
   pooling_param {
     pool: AVE
@@ -1171,7 +1162,7 @@ layer {
 layer {
   name: "Convolution20"
   type: "Convolution"
-  bottom: "Python9"
+  bottom: "Eltwise9"
   top: "Convolution20"
   convolution_param {
     num_output: 64
@@ -1267,26 +1258,25 @@ layer {
   }
 }
 layer {
-  name: "Python10"
-  type: "Python"
+  name: "Eltwise10"
+  type: "Eltwise"
   bottom: "Concat2"
   bottom: "Convolution21"
-  top: "Python10"
-  python_param {
-    module: "resnet_oc"
-    layer: "Add"
+  top: "Eltwise10"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "ReLU21"
   type: "ReLU"
-  bottom: "Python10"
-  top: "Python10"
+  bottom: "Eltwise10"
+  top: "Eltwise10"
 }
 layer {
   name: "Convolution22"
   type: "Convolution"
-  bottom: "Python10"
+  bottom: "Eltwise10"
   top: "Convolution22"
   convolution_param {
     num_output: 64
@@ -1382,26 +1372,25 @@ layer {
   }
 }
 layer {
-  name: "Python11"
-  type: "Python"
-  bottom: "Python10"
+  name: "Eltwise11"
+  type: "Eltwise"
+  bottom: "Eltwise10"
   bottom: "Convolution23"
-  top: "Python11"
-  python_param {
-    module: "resnet_oc"
-    layer: "Add"
+  top: "Eltwise11"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "ReLU23"
   type: "ReLU"
-  bottom: "Python11"
-  top: "Python11"
+  bottom: "Eltwise11"
+  top: "Eltwise11"
 }
 layer {
   name: "Convolution24"
   type: "Convolution"
-  bottom: "Python11"
+  bottom: "Eltwise11"
   top: "Convolution24"
   convolution_param {
     num_output: 64
@@ -1497,26 +1486,25 @@ layer {
   }
 }
 layer {
-  name: "Python12"
-  type: "Python"
-  bottom: "Python11"
+  name: "Eltwise12"
+  type: "Eltwise"
+  bottom: "Eltwise11"
   bottom: "Convolution25"
-  top: "Python12"
-  python_param {
-    module: "resnet_oc"
-    layer: "Add"
+  top: "Eltwise12"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "ReLU25"
   type: "ReLU"
-  bottom: "Python12"
-  top: "Python12"
+  bottom: "Eltwise12"
+  top: "Eltwise12"
 }
 layer {
   name: "Convolution26"
   type: "Convolution"
-  bottom: "Python12"
+  bottom: "Eltwise12"
   top: "Convolution26"
   convolution_param {
     num_output: 64
@@ -1612,26 +1600,25 @@ layer {
   }
 }
 layer {
-  name: "Python13"
-  type: "Python"
-  bottom: "Python12"
+  name: "Eltwise13"
+  type: "Eltwise"
+  bottom: "Eltwise12"
   bottom: "Convolution27"
-  top: "Python13"
-  python_param {
-    module: "resnet_oc"
-    layer: "Add"
+  top: "Eltwise13"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "ReLU27"
   type: "ReLU"
-  bottom: "Python13"
-  top: "Python13"
+  bottom: "Eltwise13"
+  top: "Eltwise13"
 }
 layer {
   name: "Convolution28"
   type: "Convolution"
-  bottom: "Python13"
+  bottom: "Eltwise13"
   top: "Convolution28"
   convolution_param {
     num_output: 64
@@ -1727,26 +1714,25 @@ layer {
   }
 }
 layer {
-  name: "Python14"
-  type: "Python"
-  bottom: "Python13"
+  name: "Eltwise14"
+  type: "Eltwise"
+  bottom: "Eltwise13"
   bottom: "Convolution29"
-  top: "Python14"
-  python_param {
-    module: "resnet_oc"
-    layer: "Add"
+  top: "Eltwise14"
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "ReLU29"
   type: "ReLU"
-  bottom: "Python14"
-  top: "Python14"
+  bottom: "Eltwise14"
+  top: "Eltwise14"
 }
 layer {
   name: "Pooling3"
   type: "Pooling"
-  bottom: "Python14"
+  bottom: "Eltwise14"
   top: "Pooling3"
   pooling_param {
     pool: AVE
