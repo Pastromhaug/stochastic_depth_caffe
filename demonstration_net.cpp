@@ -5,13 +5,19 @@
 #include <iostream>
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
 #include "caffe/caffe.hpp"
 #include "caffe/util/io.hpp"
 #include "caffe/blob.hpp"
 #include "caffe/sgd_solvers.hpp"
 
+
 using namespace caffe;
 using namespace std;
+
+void standardResLayer(int & elts, int & idx, vector<int>* layers_chosen, double ran, double prob);
+void transitionResLayer(int & elts, int & idx, vector<int>* layers_chosen, double ran, double prob);
 
 
 int main(int argc, char** argv)
@@ -25,14 +31,59 @@ int main(int argc, char** argv)
   	Solver<float>* solver = SolverRegistry<float>::CreateSolver(param);	
 	shared_ptr<Net<float> > net = solver->net();
 	vector<shared_ptr<Layer<float> > > layers = net->layers();
-	
-	cout << "layers size: " <<  layers.size() << endl;
-	for (int i = 0; i < layers.size(); i++) {
-		cout << layers[i]->type()  << endl; 
-		//net->ForwardFromTo(i, i+1)	
-	}
 
-	solver->Solve_StochDep();
+
+	vector<int>* layers_chosen = new vector<int>();
+	solver->ChooseLayers_StochDep(layers_chosen);
+
+	for (int i = 0; i < layers_chosen->size(); i++) {
+		cout << (*layers_chosen)[i] << ": " <<layers[(*layers_chosen)[i]]->type() << endl;
+	}
+//	solver->Solve_StochDep();
+}
+
+void standardResLayer(int & elts, int & idx, vector<int>* layers_chosen, double ran, double prob) {  
+	cout << prob << endl;
+   	if (ran < prob){ // include res block
+    	for (int i = 0; i < 10; i++){
+			(*layers_chosen)[idx] = elts;
+			elts += 1;
+			idx += 1;
+       	}
+ 	}
+   	else{  // skip res block
+		(*layers_chosen)[idx] = elts;
+		elts += 10;
+		idx += 1;
+    }
+}
+
+void transitionResLayer(int & elts, int& idx, vector<int>* layers_chosen, double ran, double prob){
+	cout << prob << endl;
+   	if (ran < prob) { //include res block
+       	for (int i = 0; i < 13; i++) { 
+			(*layers_chosen)[idx] = elts;
+			elts += 1;
+			idx += 1;
+      	}   
+  	}
+  	else { // skip res block
+		(*layers_chosen)[idx] = elts;
+		elts += 2;
+		idx += 1;
+       	
+		(*layers_chosen)[idx] = elts;
+		elts += 1;
+		idx += 1;
+      	
+		(*layers_chosen)[idx] = elts;
+		elts += 1;
+		idx += 1;
+    
+	   	(*layers_chosen)[idx] = elts;
+		elts += 9;
+		idx += 1;
+ 	}   
 }
 
 
@@ -41,42 +92,75 @@ template <typename Dtype>
 Dtype Net<Dtype>::ForwardFromTo_StochDep(vector<int>* layers_chosen) {
 	int start = 0;
 	int end = layers_.size() - 1;
-  Dtype loss = 0;
-  for (int i = start; i <= end; ++i) {
-    // LOG(ERROR) << "Forwarding " << layer_names_[i];
-    Dtype layer_loss = layers_[i]->Forward(bottom_vecs_[i], top_vecs_[i]);
-    loss += layer_loss;
-    if (debug_info_) { ForwardDebugInfo(i); }
-  }
-  return loss;
+  	Dtype loss = 0;
+  	for (int i = start; i <= end; ++i) {
+    	// LOG(ERROR) << "Forwarding " << layer_names_[i];
+    	Dtype layer_loss = layers_[i]->Forward(bottom_vecs_[i], top_vecs_[i]);
+    	loss += layer_loss;
+    	if (debug_info_) { ForwardDebugInfo(i); }
+  	}
+  	return loss;
 }
 
 template <typename Dtype>
 void Net<Dtype>::BackwardFromTo_StochDep(vector<int>* layers_chosen) {
 	int start = layers_.size() - 1; 
 	int end = 0;
-  for (int i = start; i >= end; --i) {
-    if (layer_need_backward_[i]) {
-      layers_[i]->Backward(
-          top_vecs_[i], bottom_need_backward_[i], bottom_vecs_[i]);
-      if (debug_info_) { BackwardDebugInfo(i); }
-    }
-  }
+  	for (int i = start; i >= end; --i) {
+    	if (layer_need_backward_[i]) {
+      		layers_[i]->Backward(
+          	top_vecs_[i], bottom_need_backward_[i], bottom_vecs_[i]);
+      		if (debug_info_) { BackwardDebugInfo(i); }
+    	}
+  	}
 }
 
 template<typename Dtype>
-Dtype Net<Dtype>::ForwardBackward_StochDep() {
-	vector<int>* layers_chosen = ChooseLayers_StochDep();
+Dtype Net<Dtype>::ForwardBackward_StochDep(vector<int>* layers_chosen) {
     Dtype loss;
     Forward_StochDep(layers_chosen, &loss);
     Backward_StochDep(layers_chosen);
     return loss;
 }
 
-template <typename Dtype>
-vector<int>* Net<Dtype>::ChooseLayers_StochDep(){
-	vector<int>* layers_chosen = new vector<int>(10);
-	return layers_chosen;
+template<typename Dtype>
+void Solver<Dtype>::ChooseLayers_StochDep(vector<int>* layers_chosen){
+	layers_chosen->resize(this->net()->layers().size());
+	int elts = 0;   
+    int idx = 0;
+	for (int i = 0; i < 4; i++){
+		(*layers_chosen)[idx] = elts;
+		elts += 1;
+		idx += 1;
+    }
+
+    srand(time(NULL));
+        
+    standardResLayer(elts, idx, layers_chosen, (double) rand()/RAND_MAX, 1 - 0.5*((double)0)/13);
+    standardResLayer(elts, idx, layers_chosen, (double) rand()/RAND_MAX, 1 - 0.5*((double)1)/13);
+    standardResLayer(elts, idx, layers_chosen, (double) rand()/RAND_MAX, 1 - 0.5*((double)2)/13);
+    standardResLayer(elts, idx, layers_chosen, (double) rand()/RAND_MAX, 1 - 0.5*((double)3)/13);
+
+    transitionResLayer(elts, idx, layers_chosen, (double) rand()/RAND_MAX, 1 - 0.5*((double)4)/13);
+        
+    standardResLayer(elts, idx,  layers_chosen, (double) rand()/RAND_MAX, 1 - 0.5*((double)5)/13);
+    standardResLayer(elts, idx,  layers_chosen, (double) rand()/RAND_MAX, 1 - 0.5*((double)6)/13);
+    standardResLayer(elts, idx,  layers_chosen, (double) rand()/RAND_MAX, 1 - 0.5*((double)7)/13);
+    standardResLayer(elts, idx,  layers_chosen, (double) rand()/RAND_MAX, 1 - 0.5*((double)8)/13);
+        
+    transitionResLayer(elts, idx, layers_chosen, (double) rand()/RAND_MAX, 1 - 0.5*((double)9)/13);
+        
+    standardResLayer(elts, idx, layers_chosen, (double) rand()/RAND_MAX, 1 - 0.5*((double)10)/13);
+    standardResLayer(elts, idx, layers_chosen, (double) rand()/RAND_MAX, 1 - 0.5*((double)11)/13);
+    standardResLayer(elts, idx, layers_chosen, (double) rand()/RAND_MAX, 1 - 0.5*((double)12)/13);
+    standardResLayer(elts, idx, layers_chosen, (double) rand()/RAND_MAX, 1 - 0.5*((double)13)/13);
+
+    for (int i = 0; i < 4; i++) {
+        (*layers_chosen)[idx] = elts;
+		elts += 1;
+		idx += 1;
+    }
+	layers_chosen->resize(idx);
 }
 
 template <typename Dtype>
@@ -110,7 +194,7 @@ const vector<Blob<Dtype>*>& Net<Dtype>::Forward_StochDep(vector<int>* layers_cho
 
 
 template <typename Dtype>
-void Solver<Dtype>::Step_StochDep(int iters) {
+void Solver<Dtype>::Step_StochDep(int iters, vector<int>* layers_chosen) {
   const int start_iter = iter_;
   const int stop_iter = iter_ + iters;
   int average_loss = this->param_.average_loss();
@@ -137,8 +221,10 @@ void Solver<Dtype>::Step_StochDep(int iters) {
     net_->set_debug_info(display && param_.debug_info());
     // accumulate the loss and gradient
     Dtype loss = 0;
+    
     for (int i = 0; i < param_.iter_size(); ++i) {
-      loss += net_->ForwardBackward_StochDep();
+      ChooseLayers_StochDep(layers_chosen);
+      loss += net_->ForwardBackward_StochDep(layers_chosen);
     }
     loss /= param_.iter_size();
     // average the loss across iterations for smoothed reporting
@@ -210,7 +296,8 @@ void Solver<Dtype>::Solve_StochDep(const char* resume_file) {
   // For a network that is trained by the solver, no bottom or top vecs
   // should be given, and we will just provide dummy vecs.
   int start_iter = iter_;
-  Step_StochDep(param_.max_iter() - iter_);
+  vector<int>* layers_chosen = new vector<int>();
+  Step_StochDep(param_.max_iter() - iter_, layers_chosen);
   // If we haven't already, save a snapshot after optimization, unless
   // overridden by setting snapshot_after_train := false
   if (param_.snapshot_after_train()
@@ -242,11 +329,3 @@ void Solver<Dtype>::Solve_StochDep(const char* resume_file) {
   LOG(INFO) << "Optimization Done.";
 }
 
-template <typename Dtype>
-void Solver<Dtype>::TestAll() {
-  for (int test_net_id = 0;
-       test_net_id < test_nets_.size() && !requested_early_exit_;
-       ++test_net_id) {
-    Test(test_net_id);
-  }
-}
