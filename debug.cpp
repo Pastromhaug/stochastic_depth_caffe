@@ -19,7 +19,6 @@ using namespace std;
 void standardResLayer(int & elts, int & idx, vector<int>* layers_chosen, double ran, double prob);
 void transitionResLayer(int & elts, int & idx, vector<int>* layers_chosen, double ran, double prob);
 
-
 int main(int argc, char** argv)
 {
 	std::cout << "it's working\n";
@@ -36,9 +35,10 @@ int main(int argc, char** argv)
 	vector<int>* layers_chosen = new vector<int>();
 	solver->ChooseLayers_StochDep(layers_chosen);
 
-	for (int i = 0; i < layers_chosen->size(); i++) {
-		cout << (*layers_chosen)[i] << ": " <<layers[(*layers_chosen)[i]]->type() << endl;
-	}
+//	for (int i = 0; i < layers_chosen->size(); i++) {
+//		cout << (*layers_chosen)[i] << ": " <<layers[(*layers_chosen)[i]]->type() << endl;
+//	}
+	cout << "starting solve" << endl;
 	solver->Solve_StochDep();
 }
 
@@ -83,6 +83,7 @@ void transitionResLayer(int & elts, int& idx, vector<int>* layers_chosen, double
 	   	(*layers_chosen)[idx] = elts;
 		elts += 9;
 		idx += 1;
+		cout << "skipping transition block: " << elts << endl;
  	}   
 }
 
@@ -101,20 +102,43 @@ Dtype Net<Dtype>::ForwardFromTo_StochDep(vector<int>* layers_chosen) {
 //    	if (debug_info_) { ForwardDebugInfo(i); }
 //  	}
 //  	return loss;
-//}
+//
+	cout << "ForwardFromTo b" << endl;
   	Dtype loss = 0;
 	int layer_idx;
 	int bottom_idx = 0;
   	for (int i = 0; i < layers_chosen->size(); i++) {
     	layer_idx = (*layers_chosen)[i];
 		if (i != 0) {
-			bottom_idx = (*layers_chosen)[i-1] + 1;
+			bottom_idx = (*layers_chosen)[i-1];
 		}
-    	Dtype layer_loss = layers_[layer_idx]->Forward(bottom_vecs_[bottom_idx], top_vecs_[layer_idx]);
+		if (bottom_idx != 0) {
+//		cout << bottom_vecs_[
+//		cout << "i = " << i << "\t" << bottom_idx-1 << ":" << layers()[bottom_idx-1]->type() << " \t-->\t " << layer_idx << ":" << layers()[layer_idx]->type()  << endl;}
+    	
+//		if (layer_idx == 101 || layer_idx == 48 || layer_idx == 112 || layer_idx == 59 || layer_idx == 69 || layer_idx == 122 || layer_idx == 110 || layer_idx == 111 || layer_idx == 120 || layer_idx == 121 || layer_idx == 57 || layer_idx == 58i || layer_idx == 96 || layer_idx == 88 || layer_idx == 87 ||  layer_idx == 95) {
+//            cout << "bottom vecs: "<< layer_idx << " " << layers()[layer_idx]->type() << endl;
+//            printvecblobs(bottom_vecs_, layer_idx);
+//            cout << "top vecs: " << layer_idx << " " << layers()[layer_idx]->type() <<  endl;
+//            printvecblobs(top_vecs_, layer_idx);
+//			cout << endl;
+//        }
+		}
+		Dtype layer_loss = layers_[layer_idx]->Forward(top_vecs_[bottom_idx], top_vecs_[layer_idx]);
     	loss += layer_loss;
     	if (debug_info_) { ForwardDebugInfo(layer_idx); }
   	}
+	cout << "ForwardFromTo e" << endl;
   	return loss;
+}
+
+template<typename Dtype>
+void Net<Dtype>::printvecblobs(vector<vector<Blob<Dtype>*> > vec, int &idx) {
+	for (int i = 0; i < vec[idx].size(); i++) {
+        Blob<Dtype>* blo= vec[idx][i];
+        //cout << blo->shape(0) << " " << blo->shape(1) << " " << blo->shape(2) << " " <<  blo->shape(3)  << endl;
+ 		cout << blo << endl;
+	}
 }
 
 template <typename Dtype>
@@ -129,9 +153,10 @@ void Net<Dtype>::BackwardFromTo_StochDep(vector<int>* layers_chosen) {
 //    	}
 //  	}
 //}
+	cout << "BackwardFromTo b" << endl;
   	int layer_idx;
 	int bottom_idx;
-	for (int i = layers_chosen->size()-1; i >= 0; i--) {
+	for (int i = layers_chosen->size() - 1; i >= 0; i--) {
 		layer_idx = (*layers_chosen)[i];
 		if (i == 0) {
 			bottom_idx = 0;
@@ -139,24 +164,30 @@ void Net<Dtype>::BackwardFromTo_StochDep(vector<int>* layers_chosen) {
 		else {
 			bottom_idx = (*layers_chosen)[i-1] + 1;
 		}
+		if (bottom_idx != 0) {
+		cout << "i = " << i << "\t" << bottom_idx-1 << ":" << layers()[bottom_idx-1]->type() << " \t<--\t " << layer_idx << ":" << layers()[layer_idx]->type()  << endl;}
     	if (layer_need_backward_[layer_idx]) {
       		layers_[layer_idx]->Backward(
           		top_vecs_[layer_idx], bottom_need_backward_[layer_idx], bottom_vecs_[bottom_idx]);
       		if (debug_info_) { BackwardDebugInfo(layer_idx); }
     	}
   	}
+	cout << "BackwardFromTo e" << endl;
 }
 
 template<typename Dtype>
 Dtype Net<Dtype>::ForwardBackward_StochDep(vector<int>* layers_chosen) {
+	cout << "ForwardBackward b" << endl;
     Dtype loss;
     Forward_StochDep(layers_chosen, &loss);
     Backward_StochDep(layers_chosen);
+	cout << "ForwardBAckward e" << endl;
     return loss;
 }
 
 template<typename Dtype>
 void Solver<Dtype>::ChooseLayers_StochDep(vector<int>* layers_chosen){
+	cout << "ChooseLayers b" << endl;
 	layers_chosen->resize(this->net()->layers().size());
 	int elts = 0;   
     int idx = 0;
@@ -193,10 +224,12 @@ void Solver<Dtype>::ChooseLayers_StochDep(vector<int>* layers_chosen){
 		idx += 1;
     }
 	layers_chosen->resize(idx);
+	cout << "ChooseLayers e" << endl;
 }
 
 template <typename Dtype>
 void Net<Dtype>::Backward_StochDep( vector<int>* layers_chosen) {
+  cout << "Backward b" << endl;
   BackwardFromTo_StochDep(layers_chosen);
   if (debug_info_) {
     Dtype asum_data = 0, asum_diff = 0, sumsq_data = 0, sumsq_diff = 0;
@@ -212,21 +245,25 @@ void Net<Dtype>::Backward_StochDep( vector<int>* layers_chosen) {
                << "L1 norm = (" << asum_data << ", " << asum_diff << "); "
                << "L2 norm = (" << l2norm_data << ", " << l2norm_diff << ")";
   }
+  cout << "Backward e" << endl;
 }
 
 template <typename Dtype>
 const vector<Blob<Dtype>*>& Net<Dtype>::Forward_StochDep(vector<int>* layers_chosen, Dtype* loss) {
+  cout << "Forward b" << endl;
   if (loss != NULL) {
     *loss = ForwardFromTo_StochDep(layers_chosen);
   } else {
     ForwardFromTo_StochDep(layers_chosen);
   }
+  cout << "Forward e" << endl;
   return net_output_blobs_;
 }
 
 
 template <typename Dtype>
 void Solver<Dtype>::Step_StochDep(int iters, vector<int>* layers_chosen) {
+  cout << "Step b" << endl;
   const int start_iter = iter_;
   const int stop_iter = iter_ + iters;
   int average_loss = this->param_.average_loss();
@@ -256,6 +293,9 @@ void Solver<Dtype>::Step_StochDep(int iters, vector<int>* layers_chosen) {
     
     for (int i = 0; i < param_.iter_size(); ++i) {
       ChooseLayers_StochDep(layers_chosen);
+//		for (int i = 0; i < layers_chosen->size(); i++) {
+//         	cout << (*layers_chosen)[i] << ": " <<net()->layers()[(*layers_chosen)[i]]->type() << endl;
+//      	}
       loss += net_->ForwardBackward_StochDep(layers_chosen);
     }
     loss /= param_.iter_size();
@@ -308,6 +348,7 @@ void Solver<Dtype>::Step_StochDep(int iters, vector<int>* layers_chosen) {
       break;
     }
   }
+  cout << "Step e" << endl;
 }
 
 
